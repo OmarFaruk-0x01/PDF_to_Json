@@ -10,10 +10,12 @@ from flask.json import jsonify
 from flask.templating import render_template
 # from flask_cors import CORS
 app = Flask(__name__)
-fileBasePath = './static/images/'
+fileBasePath = '/static/images/'
 app.config['static_folder'] = fileBasePath
 app.config['CORS_HEADERS'] = 'Content-Type'
 # CORS(app)
+if not (os.path.exists(fileBasePath)):
+    os.mkdir(fileBasePath)
 
 
 def getPDFInfo(stream=None):
@@ -47,7 +49,7 @@ def getPDFInfo(stream=None):
             image_bytes = base_image["image"]
             image_ext = base_image["ext"]
             imgs = open(os.path.join(fileBasePath, folderName,
-                        f'image{xref}.{image_ext}'), 'wb+')
+                                     f'image{xref}.{image_ext}'), 'wb+')
             imgs.write(image_bytes)
             imgs.close()
             pageImages.append(
