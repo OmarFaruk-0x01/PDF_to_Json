@@ -10,7 +10,7 @@ from flask.json import jsonify
 from flask.templating import render_template
 # from flask_cors import CORS
 app = Flask(__name__)
-fileBasePath = '/static/images/'
+fileBasePath = os.path.join(os.path.abspath('.'), 'static/images/')
 app.config['static_folder'] = fileBasePath
 app.config['CORS_HEADERS'] = 'Content-Type'
 # CORS(app)
