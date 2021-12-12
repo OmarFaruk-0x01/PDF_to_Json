@@ -44,18 +44,18 @@ def getPDFInfo(stream=None):
         images = page.get_images()
         totalLinksCount += len(pageLinks)
         totalImagesCount += len(images)
-        for image_index, img in enumerate(images):
-            xref = img[0]
-            base_image = pdf_file.extract_image(xref)
-            image_bytes = base_image["image"]
-            image_ext = base_image["ext"]
-            imgs = open(os.path.join(fileBasePath, folderName,
-                                     f'image{xref}.{image_ext}'), 'wb+')
-            imgs.write(image_bytes)
-            imgs.close()
-            pageImages.append(
-                {"uri": f'{request.host_url}static/images/{folderName}/image{xref}.{image_ext}', 'ext': image_ext})
-            allPages["page"+pageIndex] = pageText
+        # for image_index, img in enumerate(images):
+        #     xref = img[0]
+        #     base_image = pdf_file.extract_image(xref)
+        #     image_bytes = base_image["image"]
+        #     image_ext = base_image["ext"]
+        #     imgs = open(os.path.join(fileBasePath, folderName,
+        #                              f'image{xref}.{image_ext}'), 'wb+')
+        #     imgs.write(image_bytes)
+        #     imgs.close()
+        #     pageImages.append(
+        #         {"uri": f'{request.host_url}static/images/{folderName}/image{xref}.{image_ext}', 'ext': image_ext})
+        allPages["page"+str(pageIndex)] = pageText
         # allPages.append({
         #     # "page_size": pageSize,
         #     # "page_fonts": pageFonts,
@@ -71,7 +71,7 @@ def getPDFInfo(stream=None):
     #     # "total_links": totalLinksCount,
     #     "all_pages": allPages
     # }
-    return allPages
+    return dict(sorted(allPages.items(), key=lambda item: item[0][-1]))
 
     # for pageIndex in range(totalPageCount):
     #     page = pdf_file[pageIndex]
@@ -111,10 +111,10 @@ def getPDFInfo(stream=None):
 def getFile():
     reqFile = request.files.get('pdf').stream.read()
     try:
-        tmpFile = open('./tmp.pdf', 'wb+').write(reqFile)
-        print(run('./bin/qpdf ./tmp.pdf --password="" --decrypt tmp1.pdf').stdout)
-        tmpFile = open('./tmp1.pdf', 'rb').read()
-        pdfInfo = getPDFInfo(tmpFile)
+        # tmpFile = open('./tmp.pdf', 'wb+').write(reqFile)
+        # print(run('./bin/qpdf ./tmp.pdf --password="" --decrypt tmp1.pdf').stderr)
+        # tmpFile = open('./tmp1.pdf', 'rb').read()
+        pdfInfo = getPDFInfo(reqFile)
 
         print(request.files.get('pdf'))
         response = jsonify(status=200, data=pdfInfo)
