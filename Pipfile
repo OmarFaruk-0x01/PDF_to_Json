@@ -11,6 +11,7 @@ Pillow = "*"
 Flask = "*"
 flask-cors = "*"
 gunicorn = "*"
+"subprocess.run" = "*"
 
 [dev-packages]
 

@@ -8,6 +8,7 @@ from flask import Flask, request, Response
 from flask.helpers import url_for
 from flask.json import jsonify
 from flask.templating import render_template
+from subprocess import run
 # from flask_cors import CORS
 app = Flask(__name__)
 fileBasePath = os.path.join(os.path.abspath('.'), 'static/images/')
@@ -20,7 +21,7 @@ if not (os.path.exists(fileBasePath)):
 
 def getPDFInfo(stream=None):
     pdf_file: fitz.Document = fitz.open(stream=stream, filetype='x.pdf')
-    allPages = []
+    allPages = {}
     totalPageCount = len(pdf_file)
     totalImagesCount = 0
     totalLinksCount = 0
@@ -54,21 +55,23 @@ def getPDFInfo(stream=None):
             imgs.close()
             pageImages.append(
                 {"uri": f'{request.host_url}static/images/{folderName}/image{xref}.{image_ext}', 'ext': image_ext})
-        allPages.append({
-            "page_size": pageSize,
-            "page_fonts": pageFonts,
-            "page_links": pageLinks,
-            "page_text": pageText,
-            "page_images": pageImages,
-            "images_count": len(images),
-        })
+            allPages["page"+pageIndex] = pageText
+        # allPages.append({
+        #     # "page_size": pageSize,
+        #     # "page_fonts": pageFonts,
+        #     # "page_links": pageLinks,
+        #     "page_text": pageText,
+        #     # "page_images": pageImages,
+        #     # "images_count": len(images),
+        # })
 
-    return {
-        "total_page": totalPageCount,
-        "total_images": totalImagesCount,
-        "total_links": totalLinksCount,
-        "all_pages": allPages
-    }
+    # return {
+    #     # "total_page": totalPageCount,
+    #     # "total_images": totalImagesCount,
+    #     # "total_links": totalLinksCount,
+    #     "all_pages": allPages
+    # }
+    return allPages
 
     # for pageIndex in range(totalPageCount):
     #     page = pdf_file[pageIndex]
@@ -108,7 +111,10 @@ def getPDFInfo(stream=None):
 def getFile():
     reqFile = request.files.get('pdf').stream.read()
     try:
-        pdfInfo = getPDFInfo(reqFile)
+        tmpFile = open('./tmp.pdf', 'wb+').write(reqFile)
+        print(run('./bin/qpdf ./tmp.pdf --password="" --decrypt tmp1.pdf').stdout)
+        tmpFile = open('./tmp1.pdf', 'rb').read()
+        pdfInfo = getPDFInfo(tmpFile)
 
         print(request.files.get('pdf'))
         response = jsonify(status=200, data={**pdfInfo})
