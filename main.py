@@ -117,7 +117,7 @@ def getFile():
         pdfInfo = getPDFInfo(tmpFile)
 
         print(request.files.get('pdf'))
-        response = jsonify(status=200, data={**pdfInfo})
+        response = jsonify(status=200, data=pdfInfo)
         response.headers.add("Access-Control-Allow-Origin", "*")
         return response
     except Exception as e:
