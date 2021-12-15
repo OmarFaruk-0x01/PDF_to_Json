@@ -44,6 +44,7 @@ def getPDFInfo(stream=None):
         images = page.get_images()
         totalLinksCount += len(pageLinks)
         totalImagesCount += len(images)
+
         # for image_index, img in enumerate(images):
         #     xref = img[0]
         #     base_image = pdf_file.extract_image(xref)
@@ -72,39 +73,6 @@ def getPDFInfo(stream=None):
     #     "all_pages": allPages
     # }
     return dict(sorted(allPages.items(), key=lambda item: item[0][-1]))
-
-    # for pageIndex in range(totalPageCount):
-    #     page = pdf_file[pageIndex]
-
-# for page_index in range(len(pdf_file)):
-
-#     # get the page itself
-#     page = pdf_file[page_index]
-#     image_list = page.get_images()
-#     pageText = page
-#     # print(dir(page))
-#     print(page.language)
-#     # printing number of images found in this page
-#     # if image_list:
-#     #     print(
-#     #         f"[+] Found a total of {len(image_list)} images in page {page_index}")
-#     # else:
-#     #     print("[!] No images found on page", page_index)
-#     # for image_index, img in enumerate(page.getImageList()):
-
-#     #     # get the XREF of the image
-#     #     xref = img[0]
-
-#     #     # extract the image bytes
-#     #     base_image = pdf_file.extract_image(xref)
-#     #     image_bytes = base_image["image"]
-
-#     #     # get the image extension
-#     #     image_ext = base_image["ext"]
-#     #     # imgs = open(f'image{xref}.{image_ext}', 'wb+')
-#     #     # imgs.write(image_bytes)
-#     #     # imgs.close()
-#     #     print(xref, image_ext)
 
 
 @app.route('/getjson', methods=['POST'])
