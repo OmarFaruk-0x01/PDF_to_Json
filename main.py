@@ -21,7 +21,7 @@ if not (os.path.exists(fileBasePath)):
 
 def getPDFInfo(stream=None):
     pdf_file: fitz.Document = fitz.open(stream=stream, filetype='x.pdf')
-    allPages = {}
+    allPages = []
     totalPageCount = len(pdf_file)
     totalImagesCount = 0
     totalLinksCount = 0
@@ -44,6 +44,9 @@ def getPDFInfo(stream=None):
         images = page.get_images()
         totalLinksCount += len(pageLinks)
         totalImagesCount += len(images)
+
+        # This block of code for extracting images from pdf.
+
         # for image_index, img in enumerate(images):
         #     xref = img[0]
         #     base_image = pdf_file.extract_image(xref)
@@ -55,65 +58,35 @@ def getPDFInfo(stream=None):
         #     imgs.close()
         #     pageImages.append(
         #         {"uri": f'{request.host_url}static/images/{folderName}/image{xref}.{image_ext}', 'ext': image_ext})
-        allPages["page"+str(pageIndex)] = pageText
-        # allPages.append({
-        #     # "page_size": pageSize,
-        #     # "page_fonts": pageFonts,
-        #     # "page_links": pageLinks,
-        #     "page_text": pageText,
-        #     # "page_images": pageImages,
-        #     # "images_count": len(images),
-        # })
 
-    # return {
-    #     # "total_page": totalPageCount,
-    #     # "total_images": totalImagesCount,
-    #     # "total_links": totalLinksCount,
-    #     "all_pages": allPages
-    # }
-    return dict(sorted(allPages.items(), key=lambda item: item[0][-1]))
+        allPages.append({
+            "page_size": pageSize,
+            "page_fonts": pageFonts,
+            "page_links": pageLinks,
+            "page_text": pageText,
+            # "page_images": pageImages,
+            # "images_count": len(images),
+        })
 
-    # for pageIndex in range(totalPageCount):
-    #     page = pdf_file[pageIndex]
-
-# for page_index in range(len(pdf_file)):
-
-#     # get the page itself
-#     page = pdf_file[page_index]
-#     image_list = page.get_images()
-#     pageText = page
-#     # print(dir(page))
-#     print(page.language)
-#     # printing number of images found in this page
-#     # if image_list:
-#     #     print(
-#     #         f"[+] Found a total of {len(image_list)} images in page {page_index}")
-#     # else:
-#     #     print("[!] No images found on page", page_index)
-#     # for image_index, img in enumerate(page.getImageList()):
-
-#     #     # get the XREF of the image
-#     #     xref = img[0]
-
-#     #     # extract the image bytes
-#     #     base_image = pdf_file.extract_image(xref)
-#     #     image_bytes = base_image["image"]
-
-#     #     # get the image extension
-#     #     image_ext = base_image["ext"]
-#     #     # imgs = open(f'image{xref}.{image_ext}', 'wb+')
-#     #     # imgs.write(image_bytes)
-#     #     # imgs.close()
-#     #     print(xref, image_ext)
+    return {
+        "total_page": totalPageCount,
+        # "total_images": totalImagesCount,
+        "total_links": totalLinksCount,
+        "all_pages": allPages
+    }
 
 
 @app.route('/getjson', methods=['POST'])
 def getFile():
     reqFile = request.files.get('pdf').stream.read()
     try:
+
+        # This block of code used for decrypting encrypted PDF file.
+
         # tmpFile = open('./tmp.pdf', 'wb+').write(reqFile)
         # print(run('./bin/qpdf ./tmp.pdf --password="" --decrypt tmp1.pdf').stderr)
         # tmpFile = open('./tmp1.pdf', 'rb').read()
+
         pdfInfo = getPDFInfo(reqFile)
 
         print(request.files.get('pdf'))
